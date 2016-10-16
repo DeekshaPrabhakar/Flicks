@@ -9,15 +9,19 @@
 import UIKit
 import AFNetworking
 
-class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     
     @IBOutlet weak var tableView: UITableView!
+    
+    @IBOutlet weak var collectionView: UICollectionView!
+    
+    @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
+    
     var movies: [Movie]?
     var endpoint:String!
     var refreshControl:UIRefreshControl!
     var loadingStateView:LoadingIndicatorView?
     var isDataLoading = false
-    var isCurrentViewTableView = true
     var viewToggleBtn: UIButton!
     
     @IBOutlet weak var networkErrorView: UIView!
@@ -28,6 +32,17 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         
         tableView.dataSource = self
         tableView.delegate = self
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        
+        tableView.isHidden = false
+        collectionView.isHidden = true
+        
+        flowLayout.minimumLineSpacing = 0
+        flowLayout.minimumInteritemSpacing = 0
+        flowLayout.sectionInset = UIEdgeInsetsMake(0, 0, 0, 0)
+        let picDimension = collectionView.frame.size.width/3
+        flowLayout.itemSize =  CGSize(width:picDimension, height:picDimension)
         
         setUpToggleViewsButton()
         hideNetworkErrorView()
@@ -39,7 +54,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     
     private func setUpToggleViewsButton(){
         viewToggleBtn = UIButton()
-        viewToggleBtn.setImage(UIImage(named: "tableview"), for: .normal)
+        viewToggleBtn.setImage(UIImage(named: "collectionview"), for: .normal)
         viewToggleBtn.frame = CGRect.init(x: 0, y: 0, width: 25, height: 25)
         viewToggleBtn.addTarget(self, action: #selector(MoviesViewController.toggleViews), for: .touchUpInside)
         
@@ -102,7 +117,12 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                 self.movies = movies
                 self.refreshControl.endRefreshing()
                 self.hideLoadingIndicator();
-                self.tableView.reloadData()
+                if(self.tableView.isHidden){
+                    self.collectionView.reloadData()
+                }
+                else{
+                    self.tableView.reloadData()
+                }
             }
         }
     }
@@ -113,15 +133,50 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     func toggleViews(sender: UIButton){
-        if(isCurrentViewTableView){
-             viewToggleBtn.setImage(UIImage(named: "collectionview"), for: .normal)
-            isCurrentViewTableView = false
+        
+        if(tableView.isHidden){
+            viewToggleBtn.setImage(UIImage(named: "collectionview"), for: .normal)
+            collectionView.isHidden = true
+            tableView.isHidden = false
+            self.tableView.reloadData()
         }
         else
         {
             viewToggleBtn.setImage(UIImage(named: "tableview"), for: .normal)
+            tableView.isHidden = true
+            collectionView.isHidden = false
+            self.collectionView.reloadData()
         }
     }
+    
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 1
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        if let movies = movies {
+            return movies.count
+        }
+        else
+        {
+            return 0
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "MovieCollectionCell", for: indexPath) as! MovieCollectionViewCell
+        
+        let movie = movies![indexPath.item]
+        
+        if  movie.posterPath != nil {
+            let imageUrl = NSURL(string: movie.posterPath!)
+            //cell.posterView.setImageWith(imageUrl as! URL)
+        }
+        
+        print("row \(indexPath.row)")
+        return cell
+    }
+    
     
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int{
         if let movies = movies {
@@ -131,8 +186,8 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         {
             return 0
         }
-        
     }
+    
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell{
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "MovieCell", for: indexPath) as! MovieCell
@@ -189,12 +244,21 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
-        let cell = sender as! UITableViewCell
-        let indexPath = tableView.indexPath(for: cell)
-        let movie = movies![indexPath!.row]
+        if let cell = sender as? UITableViewCell{
+            let indexPath = tableView.indexPath(for: cell)
+            let movie = movies![indexPath!.row]
+            
+            let detailViewController = segue.destination as! DetailViewController
+            detailViewController.movie = movie
+        }
+        else if let cell = sender as? UICollectionViewCell{
+            let indexPath = collectionView.indexPath(for: cell)
+            let movie = movies![indexPath!.row]
+            
+            let detailViewController = segue.destination as! DetailViewController
+            detailViewController.movie = movie
+        }
         
-        let detailViewController = segue.destination as! DetailViewController
-        detailViewController.movie = movie
     }
     
     

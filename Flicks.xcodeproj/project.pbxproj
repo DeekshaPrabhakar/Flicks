@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		61B6CAB74EDDAC346F014DC1 /* Pods_Flicks.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C9982148B4D2F5084468084 /* Pods_Flicks.framework */; };
 		CB2641F51DB2F313009789AB /* LoadingIndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB2641F41DB2F313009789AB /* LoadingIndicatorView.swift */; };
+		CB2641F71DB31715009789AB /* MovieCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB2641F61DB31715009789AB /* MovieCollectionViewCell.swift */; };
 		CB5C0D3F1DAD445D00C8E137 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB5C0D3E1DAD445D00C8E137 /* AppDelegate.swift */; };
 		CB5C0D441DAD445D00C8E137 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CB5C0D421DAD445D00C8E137 /* Main.storyboard */; };
 		CB5C0D461DAD445D00C8E137 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CB5C0D451DAD445D00C8E137 /* Assets.xcassets */; };
@@ -24,6 +25,7 @@
 		9C9982148B4D2F5084468084 /* Pods_Flicks.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Flicks.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AE020A149070ED4E22B53748 /* Pods-Flicks.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Flicks.release.xcconfig"; path = "Pods/Target Support Files/Pods-Flicks/Pods-Flicks.release.xcconfig"; sourceTree = "<group>"; };
 		CB2641F41DB2F313009789AB /* LoadingIndicatorView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoadingIndicatorView.swift; sourceTree = "<group>"; };
+		CB2641F61DB31715009789AB /* MovieCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MovieCollectionViewCell.swift; sourceTree = "<group>"; };
 		CB5C0D3B1DAD445D00C8E137 /* Flicks.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Flicks.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CB5C0D3E1DAD445D00C8E137 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		CB5C0D431DAD445D00C8E137 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -86,6 +88,7 @@
 			children = (
 				CB5C0D531DADA78200C8E137 /* MovieCell.swift */,
 				CB2641F41DB2F313009789AB /* LoadingIndicatorView.swift */,
+				CB2641F61DB31715009789AB /* MovieCollectionViewCell.swift */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -265,6 +268,7 @@
 				CB2641F51DB2F313009789AB /* LoadingIndicatorView.swift in Sources */,
 				CB5C0D581DAEBDFB00C8E137 /* DetailViewController.swift in Sources */,
 				CB5C0D661DB1D15200C8E137 /* Movie.swift in Sources */,
+				CB2641F71DB31715009789AB /* MovieCollectionViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
