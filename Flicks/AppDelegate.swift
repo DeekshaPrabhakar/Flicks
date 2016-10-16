@@ -22,7 +22,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         let nowPlayingNavigationController = storyboard.instantiateViewController(withIdentifier: "MoviesNavigationController") as! UINavigationController
         let nowPlayingViewController = nowPlayingNavigationController.topViewController as! MoviesViewController
-        nowPlayingViewController.endpoint = "now_playing";
+        nowPlayingViewController.endpoint = "now_playin";
         nowPlayingNavigationController.tabBarItem.title = "Now Playing"
         nowPlayingNavigationController.tabBarItem.image = UIImage(named: "nowPlaying")
         
@@ -35,6 +35,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         let tabBarController = UITabBarController()
         tabBarController.viewControllers = [nowPlayingNavigationController, topRatedNavigationController]
+        tabBarController.tabBar.barTintColor = UIColor.init(red: CGFloat(255)/255, green: CGFloat(145)/255, blue: CGFloat(0)/255, alpha: 1)
+        tabBarController.tabBar.tintColor = UIColor.black
+        tabBarController.tabBar.isTranslucent = false
         window?.rootViewController = tabBarController
         window?.makeKeyAndVisible()
         

@@ -12,9 +12,16 @@ import AFNetworking
 class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     @IBOutlet weak var tableView: UITableView!
-    var movies: [NSDictionary]?
+    var movies: [Movie]?
     var endpoint:String!
+    var refreshControl:UIRefreshControl!
+    var loadingStateView:LoadingIndicatorView?
+    var isDataLoading = false
+    var isCurrentViewTableView = true
+    var viewToggleBtn: UIButton!
     
+    @IBOutlet weak var networkErrorView: UIView!
+    private var brain = MovieBrain()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,14 +29,98 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         tableView.dataSource = self
         tableView.delegate = self
         
+        setUpToggleViewsButton()
+        hideNetworkErrorView()
+        setupRefreshControl()
+        setUpLoadingIndicator()
+        showLoadingIndicator()
+        getOrRefreshMovies()
+    }
+    
+    private func setUpToggleViewsButton(){
+        viewToggleBtn = UIButton()
+        viewToggleBtn.setImage(UIImage(named: "tableview"), for: .normal)
+        viewToggleBtn.frame = CGRect.init(x: 0, y: 0, width: 25, height: 25)
+        viewToggleBtn.addTarget(self, action: #selector(MoviesViewController.toggleViews), for: .touchUpInside)
         
-       networkRequest()
-        // Do any additional setup after loading the view.
+        let leftBarButtonItem:UIBarButtonItem = UIBarButtonItem()
+        leftBarButtonItem.customView = viewToggleBtn
+        navigationItem.leftBarButtonItem = leftBarButtonItem
+    }
+    
+    private func showNetworkErrorView(){
+        UIView.animate(withDuration: 0.4, delay: 0, options: UIViewAnimationOptions.curveEaseIn, animations: {
+            self.networkErrorView.isHidden = false
+            self.networkErrorView.frame.size.height = 44
+            }, completion: nil)
+    }
+    
+    private func hideNetworkErrorView(){
+        UIView.animate(withDuration: 0.4, delay: 0, options: UIViewAnimationOptions.curveEaseOut, animations: {
+            self.networkErrorView.isHidden = true
+            self.networkErrorView.frame.size.height = 0
+            }, completion: nil)
+    }
+    
+    private func setupRefreshControl(){
+        refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(getOrRefreshMovies), for: UIControlEvents.valueChanged)
+        let attributes = [NSForegroundColorAttributeName: UIColor.black, NSFontAttributeName: UIFont.boldSystemFont(ofSize: 20)]
+        let attributedTitle = NSAttributedString(string: "Pull to refresh", attributes: attributes)
+        refreshControl.attributedTitle = attributedTitle
+        refreshControl.tintColor = UIColor.black
+        tableView.insertSubview(refreshControl, at: 0)
+    }
+    
+    private func setUpLoadingIndicator(){
+        var middleY = UIScreen.main.bounds.size.height/2;
+        middleY  = middleY - self.navigationController!.navigationBar.frame.height - self.tabBarController!.tabBar.frame.height
+        let frame = CGRect(x: 0, y: middleY, width: tableView.bounds.size.width, height: LoadingIndicatorView.defaultHeight)
+        loadingStateView = LoadingIndicatorView(frame: frame)
+        loadingStateView!.isHidden = true
+        tableView.addSubview(loadingStateView!)
+    }
+    
+    private func showLoadingIndicator(){
+        isDataLoading = true
+        loadingStateView!.startAnimating()
+    }
+    
+    private func hideLoadingIndicator(){
+        isDataLoading = false
+        loadingStateView!.stopAnimating()
+    }
+    
+    func getOrRefreshMovies() {
+        
+        brain.getMovies(endpoint: endpoint) { (movies, error) in
+            if(error != nil) {
+                self.hideLoadingIndicator()
+                self.showNetworkErrorView()
+            }
+            else {
+                self.movies = movies
+                self.refreshControl.endRefreshing()
+                self.hideLoadingIndicator();
+                self.tableView.reloadData()
+            }
+        }
     }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    func toggleViews(sender: UIButton){
+        if(isCurrentViewTableView){
+             viewToggleBtn.setImage(UIImage(named: "collectionview"), for: .normal)
+            isCurrentViewTableView = false
+        }
+        else
+        {
+            viewToggleBtn.setImage(UIImage(named: "tableview"), for: .normal)
+        }
     }
     
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int{
@@ -43,21 +134,20 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         
     }
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell{
+        
         let cell = tableView.dequeueReusableCell(withIdentifier: "MovieCell", for: indexPath) as! MovieCell
         
         let movie = movies![indexPath.row]
-        let title = movie["title"] as! String
-        let overview = movie["overview"] as! String
-        
-        cell.titleLabel.text = title
-        cell.overviewLabel.text = overview
+        cell.titleLabel.text = movie.title
+        cell.overviewLabel.text = movie.overview
         cell.overviewLabel.sizeToFit()
+        cell.ratingLabel.text = String(movie.rating)
+        cell.ratingIcon.image = UIImage(named: "star")
+        cell.releaseDateLabel.text = movie.releaseDate
+        cell.releaseDateIcon.image = UIImage(named: "calendar")
         
-        if let posterPath = movie["poster_path"] as? String {
-            
-            let baseUrl = "https://image.tmdb.org/t/p/w500"
-            let imageUrl = NSURL(string: baseUrl + posterPath)
-            
+        if  movie.posterPath != nil {
+            let imageUrl = NSURL(string: movie.posterPath!)
             cell.posterView.setImageWith(imageUrl as! URL)
         }
         
@@ -79,13 +169,17 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             if let data = dataOrNil {
                 if let responseDictionary = try! JSONSerialization.jsonObject(with: data, options:[]) as? NSDictionary {
                     NSLog("response: \(responseDictionary)")
-                    self.movies = (responseDictionary["results"] as! [NSDictionary])
+                    //self.movies = (responseDictionary["results"] as! [NSDictionary])
                     
                     self.tableView.reloadData()
                 }
             }
         });
         task.resume()
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
     }
     
     

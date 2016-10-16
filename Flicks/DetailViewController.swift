@@ -22,7 +22,7 @@ class DetailViewController: UIViewController {
     
     @IBOutlet weak var infoView: UIView!
     
-    var movie:NSDictionary!
+    var movie:Movie!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,17 +30,16 @@ class DetailViewController: UIViewController {
         
         scrollView.contentSize = CGSize(width: scrollView.frame.size.width, height: infoView.frame.origin.y + infoView.frame.size.height)
         
-        let title = movie["title"] as! String
-        let overview = movie["overview"] as! String
+        let title = movie.title
+        let overview = movie.overview
         
         titleLabel.text = title
         overviewLabel.text = overview
         
         overviewLabel.sizeToFit()
         
-        if let posterPath = movie["poster_path"] as? String {
-            let baseUrl = "https://image.tmdb.org/t/p/w500"
-            let imageUrl = NSURL(string: baseUrl + posterPath)
+        if  movie.posterPath != nil {
+            let imageUrl = NSURL(string: movie.posterPath!)
             posterImageView.setImageWith(imageUrl as! URL)
         }
         
