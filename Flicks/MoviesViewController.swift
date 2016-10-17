@@ -9,22 +9,21 @@
 import UIKit
 import AFNetworking
 
-class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UISearchBarDelegate {
     
     @IBOutlet weak var tableView: UITableView!
-    
     @IBOutlet weak var collectionView: UICollectionView!
-    
     @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
+    @IBOutlet weak var networkErrorView: UIView!
+    @IBOutlet weak var searchBar: UISearchBar!
     
     var movies: [Movie]?
+    var filteredData:[Movie] = []
     var endpoint:String!
     var refreshControl:UIRefreshControl!
     var loadingStateView:LoadingIndicatorView?
     var isDataLoading = false
     var viewToggleBtn: UIButton!
-    
-    @IBOutlet weak var networkErrorView: UIView!
     private var brain = MovieBrain()
     
     override func viewDidLoad() {
@@ -32,17 +31,17 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         
         tableView.dataSource = self
         tableView.delegate = self
+        
         collectionView.dataSource = self
         collectionView.delegate = self
-        
-        tableView.isHidden = false
-        collectionView.isHidden = true
         
         flowLayout.minimumLineSpacing = 0
         flowLayout.minimumInteritemSpacing = 0
         flowLayout.sectionInset = UIEdgeInsetsMake(0, 0, 0, 0)
         let picDimension = collectionView.frame.size.width/3
         flowLayout.itemSize =  CGSize(width:picDimension, height:picDimension)
+        
+        searchBar.delegate = self
         
         setUpToggleViewsButton()
         hideNetworkErrorView()
@@ -51,6 +50,44 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         showLoadingIndicator()
         getOrRefreshMovies()
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        updateToggleButtonNView()
+    }
+    
+    private func updateToggleButtonNView(){
+        let currView = brain.getCurrentView()
+        if(currView == "table"){
+            viewToggleBtn.setImage(UIImage(named: "collectionview"), for: .normal)
+            collectionView.isHidden = true
+            tableView.isHidden = false
+            self.tableView.reloadData()
+        }
+        else if(currView == "collection"){
+            viewToggleBtn.setImage(UIImage(named: "tableview"), for: .normal)
+            tableView.isHidden = true
+            collectionView.isHidden = false
+            self.collectionView.reloadData()
+        }
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchText.isEmpty {
+            getOrRefreshMovies()
+        } else {
+            movies = (movies?.filter({(movieObj: Movie) -> Bool in
+                return (movieObj.title.range(of: searchText, options: .caseInsensitive) != nil)
+            }))!
+           
+            if(!tableView.isHidden){
+                tableView.reloadData()
+            }
+            else if(!collectionView.isHidden){
+                collectionView.reloadData()
+            }
+        }
+    }
+    
     
     private func setUpToggleViewsButton(){
         viewToggleBtn = UIButton()
@@ -61,12 +98,14 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         let leftBarButtonItem:UIBarButtonItem = UIBarButtonItem()
         leftBarButtonItem.customView = viewToggleBtn
         navigationItem.leftBarButtonItem = leftBarButtonItem
+        updateToggleButtonNView()
     }
     
     private func showNetworkErrorView(){
         UIView.animate(withDuration: 0.4, delay: 0, options: UIViewAnimationOptions.curveEaseIn, animations: {
             self.networkErrorView.isHidden = false
             self.networkErrorView.frame.size.height = 44
+            
             }, completion: nil)
     }
     
@@ -117,11 +156,12 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                 self.movies = movies
                 self.refreshControl.endRefreshing()
                 self.hideLoadingIndicator();
-                if(self.tableView.isHidden){
-                    self.collectionView.reloadData()
-                }
-                else{
+                
+                if(!self.tableView.isHidden){
                     self.tableView.reloadData()
+                }
+                else if(!self.collectionView.isHidden){
+                    self.collectionView.reloadData()
                 }
             }
         }
@@ -170,13 +210,10 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         
         if  movie.posterPath != nil {
             let imageUrl = NSURL(string: movie.posterPath!)
-            //cell.posterView.setImageWith(imageUrl as! URL)
+            cell.posterView.setImageWith(imageUrl as! URL)
         }
-        
-        print("row \(indexPath.row)")
         return cell
     }
-    
     
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int{
         if let movies = movies {
@@ -205,51 +242,31 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             let imageUrl = NSURL(string: movie.posterPath!)
             cell.posterView.setImageWith(imageUrl as! URL)
         }
-        
-        print("row \(indexPath.row)")
         return cell
-    }
-    
-    func networkRequest(){
-        let apiKey = "3fde3a7001c8039ba2283ebb55662938"
-        let url = URL(string:"https://api.themoviedb.org/3/movie/\(endpoint!)?language=en-US&api_key=\(apiKey)")
-        let request = URLRequest(url: url!)
-        let session = URLSession(
-            configuration: URLSessionConfiguration.default,
-            delegate:nil,
-            delegateQueue:OperationQueue.main
-        )
-        
-        let task : URLSessionDataTask = session.dataTask(with: request,completionHandler: { (dataOrNil, response, error) in
-            if let data = dataOrNil {
-                if let responseDictionary = try! JSONSerialization.jsonObject(with: data, options:[]) as? NSDictionary {
-                    NSLog("response: \(responseDictionary)")
-                    //self.movies = (responseDictionary["results"] as! [NSDictionary])
-                    
-                    self.tableView.reloadData()
-                }
-            }
-        });
-        task.resume()
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        if(tableView.isHidden){
+             brain.updateCurrentView(currView: "collection")
+        }
+        else if(collectionView.isHidden){
+            brain.updateCurrentView(currView: "table")
+        }
+    }
     
-    // MARK: - Navigation
-    
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+        
         if let cell = sender as? UITableViewCell{
             let indexPath = tableView.indexPath(for: cell)
             let movie = movies![indexPath!.row]
             
             let detailViewController = segue.destination as! DetailViewController
             detailViewController.movie = movie
+            brain.updateCurrentView(currView: "table")
         }
         else if let cell = sender as? UICollectionViewCell{
             let indexPath = collectionView.indexPath(for: cell)
@@ -257,9 +274,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             
             let detailViewController = segue.destination as! DetailViewController
             detailViewController.movie = movie
+            brain.updateCurrentView(currView: "collection")
         }
-        
     }
-    
-    
 }

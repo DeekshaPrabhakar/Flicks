@@ -50,5 +50,19 @@ class MovieBrain: NSObject {
         });
         task.resume()
     }
+    
+    //read persisted data
+    func getCurrentView() -> String{
+        let defaults = UserDefaults.standard
+        let currentView = defaults.string(forKey: "CurrentView")
+       return currentView!
+    }
+    
+    //set data to persist
+    func updateCurrentView(currView: String) {
+        let defaults = UserDefaults.standard
+        defaults.set(currView, forKey: "CurrentView")
+        defaults.synchronize()
+    }
 }
 /* */
