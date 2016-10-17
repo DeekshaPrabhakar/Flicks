@@ -78,7 +78,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             movies = (movies?.filter({(movieObj: Movie) -> Bool in
                 return (movieObj.title.range(of: searchText, options: .caseInsensitive) != nil)
             }))!
-           
+            
             if(!tableView.isHidden){
                 tableView.reloadData()
             }
@@ -210,7 +210,12 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         
         if  movie.posterPath != nil {
             let imageUrl = NSURL(string: movie.posterPath!)
-            cell.posterView.setImageWith(imageUrl as! URL)
+            cell.posterView.alpha = 0
+           
+            UIView.animate(withDuration: 0.4, delay: 0, options: UIViewAnimationOptions.curveEaseIn, animations: {
+                 cell.posterView.setImageWith(imageUrl as! URL)
+                cell.posterView.alpha = 1
+                }, completion: nil)
         }
         return cell
     }
@@ -251,7 +256,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     
     override func viewWillDisappear(_ animated: Bool) {
         if(tableView.isHidden){
-             brain.updateCurrentView(currView: "collection")
+            brain.updateCurrentView(currView: "collection")
         }
         else if(collectionView.isHidden){
             brain.updateCurrentView(currView: "table")

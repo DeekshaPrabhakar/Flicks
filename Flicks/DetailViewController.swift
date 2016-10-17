@@ -50,7 +50,12 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate {
         
         if  movie.posterPath != nil {
             let imageUrl = NSURL(string: movie.posterPath!)
-            posterImageView.setImageWith(imageUrl as! URL)
+            posterImageView.alpha = 0
+            
+            UIView.animate(withDuration: 0.4, delay: 0, options: UIViewAnimationOptions.curveEaseIn, animations: {
+                self.posterImageView.setImageWith(imageUrl as! URL)
+                self.posterImageView.alpha = 1
+                }, completion: nil)
         }
         
         navigationItem.title = title
