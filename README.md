@@ -37,7 +37,15 @@ The following **additional** features are implemented:
 
 Here's a walkthrough of implemented user stories:
 
-<img src='https://github.com/DeekshaPrabhakar/Flicks/blob/master/flicksWalkthrough.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<table>
+<tr><th>Walkthrough of all stories, except images fade in and large poster low-res image first then high-res</th><th>Updated UI, with fadein and large poster low-res image first then high-res </th></tr>
+<tr><td>
+<img src='https://github.com/DeekshaPrabhakar/Flicks/blob/master/flicksWalkthrough1.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+</td>
+<td><img src='https://github.com/DeekshaPrabhakar/Flicks/blob/master/flicksWalkthrough.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+</td>
+</tr>
+</table>
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
