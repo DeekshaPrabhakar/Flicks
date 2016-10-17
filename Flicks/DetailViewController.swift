@@ -49,13 +49,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate {
         releaseDateIcon.image = UIImage(named: "calendarWhite64")
         
         if  movie.posterPath != nil {
-            let imageUrl = NSURL(string: movie.posterPath!)
-            posterImageView.alpha = 0
-            
-            UIView.animate(withDuration: 0.4, delay: 0, options: UIViewAnimationOptions.curveEaseIn, animations: {
-                self.posterImageView.setImageWith(imageUrl as! URL)
-                self.posterImageView.alpha = 1
-                }, completion: nil)
+          posterlowHighRes()
         }
         
         navigationItem.title = title
@@ -71,6 +65,47 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate {
         self.view.addGestureRecognizer(swipeDown)
     }
     
+    func posterlowHighRes() {
+        let smallImageRequest = NSURLRequest(url: NSURL(string: movie.posterPathLowResolution!)! as URL)
+        let largeImageRequest = NSURLRequest(url: NSURL(string: movie.posterPathHighResolution!)! as URL)
+        
+        self.posterImageView.setImageWith(
+            smallImageRequest as URLRequest,
+            placeholderImage: nil,
+            success: { (smallImageRequest, smallImageResponse, smallImage) -> Void in
+                
+                // smallImageResponse will be nil if the smallImage is already available
+                // in cache (might want to do something smarter in that case).
+                self.posterImageView.alpha = 0.0
+                self.posterImageView.image = smallImage;
+                
+                UIView.animate(withDuration: 0.3, animations: { () -> Void in
+                    
+                    self.posterImageView.alpha = 1.0
+                    
+                    }, completion: { (sucess) -> Void in
+                        
+                        // The AFNetworking ImageView Category only allows one request to be sent at a time
+                        // per ImageView. This code must be in the completion block.
+                        self.posterImageView.setImageWith(
+                            largeImageRequest as URLRequest,
+                            placeholderImage: smallImage,
+                            success: { (largeImageRequest, largeImageResponse, largeImage) -> Void in
+                                
+                                self.posterImageView.image = largeImage;
+                                
+                            },
+                            failure: { (request, response, error) -> Void in
+                                // do something for the failure condition of the large image request
+                                // possibly setting the ImageView's image to a default image
+                        })
+                })
+            },
+            failure: { (request, response, error) -> Void in
+                // do something for the failure condition
+                // possibly try to get the large image
+        })
+    }
 
     func toggleDetailsView(gesture: UIGestureRecognizer){
         let top:CGPoint = infoView.frame.origin
