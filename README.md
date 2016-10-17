@@ -19,8 +19,8 @@ The following **optional** features are implemented:
 - [x] Add a tab bar for **Now Playing** and **Top Rated** movies.
 - [x] Using one UI bar button item instead of segmented control to switch between list view and grid view. 
 - [x] Add a search bar.
-- [ ] All images fade in.
-- [ ] For the large poster, load the low-res image first, switch to high-res when complete.
+- [x] All images fade in.
+- [x] For the large poster, load the low-res image first, switch to high-res when complete.
 - [x] Customize the highlight and selection effect of the cell.
 - [x] Customize the navigation bar.
 
@@ -31,12 +31,13 @@ The following **additional** features are implemented:
 - [x] Loading state is not using 3rd party library but a custom view
 - [x] App Icon and Launch Screen image
 - [x] tableviewcell separator custom insets
+- [x] list/grid view selection persisted through navigation from main and detail screen
 
 ## Video Walkthrough
 
 Here's a walkthrough of implemented user stories:
 
-<img src='https://github.com/DeekshaPrabhakar/Flicks/blob/master/flicksWalkthrough1.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<img src='https://github.com/DeekshaPrabhakar/Flicks/blob/master/flicksWalkthrough.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
