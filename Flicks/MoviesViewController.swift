@@ -53,6 +53,13 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     
     override func viewWillAppear(_ animated: Bool) {
         updateToggleButtonNView()
+        
+        if (endpoint == "now_playing"){
+             navigationItem.title = "Now Playing"
+        }
+        else if (endpoint == "top_rated"){
+            navigationItem.title = "Top Rated"
+        }
     }
     
     private func updateToggleButtonNView(){
@@ -89,11 +96,11 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     
-    private func setUpToggleViewsButton(){
+     func setUpToggleViewsButton(){
         viewToggleBtn = UIButton()
         viewToggleBtn.setImage(UIImage(named: "collectionview"), for: .normal)
         viewToggleBtn.frame = CGRect.init(x: 0, y: 0, width: 25, height: 25)
-        viewToggleBtn.addTarget(self, action: #selector(MoviesViewController.toggleViews), for: .touchUpInside)
+        viewToggleBtn.addTarget(self, action: #selector(toggleViews), for: .touchUpInside)
         
         let leftBarButtonItem:UIBarButtonItem = UIBarButtonItem()
         leftBarButtonItem.customView = viewToggleBtn
@@ -281,5 +288,8 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             detailViewController.movie = movie
             brain.updateCurrentView(currView: "collection")
         }
+        let backItem = UIBarButtonItem()
+        backItem.title = "Back"
+        navigationItem.backBarButtonItem = backItem
     }
 }

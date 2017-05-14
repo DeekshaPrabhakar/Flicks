@@ -52,7 +52,10 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate {
           posterlowHighRes()
         }
         
-        navigationItem.title = title
+        var truncatedTitle = title
+//        let index = truncatedTitle?.index((truncatedTitle?.startIndex)!, offsetBy: 15)
+//        truncatedTitle = truncatedTitle?.substring(to: index!)
+        navigationItem.title = truncatedTitle
         
         let swipeUp = UISwipeGestureRecognizer(target: self, action: Selector(("toggleDetailsView:")))
         swipeUp.direction = UISwipeGestureRecognizerDirection.up
@@ -64,6 +67,7 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate {
         swipeDown.delegate = self
         self.view.addGestureRecognizer(swipeDown)
     }
+    
     
     func posterlowHighRes() {
         let smallImageRequest = NSURLRequest(url: NSURL(string: movie.posterPathLowResolution!)! as URL)
@@ -127,10 +131,6 @@ class DetailViewController: UIViewController, UIGestureRecognizerDelegate {
                 break
             }
         }
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        navigationItem.backBarButtonItem?.title = "Back"
     }
     
     override func didReceiveMemoryWarning() {
