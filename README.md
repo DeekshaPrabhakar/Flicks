@@ -37,15 +37,8 @@ The following **additional** features are implemented:
 
 Here's a walkthrough of implemented user stories:
 
-<table>
-<tr><th>Walkthrough of all stories, except images fade in and large poster low-res image first then high-res</th><th>Updated UI, with fadein and large poster low-res image first then high-res </th></tr>
-<tr><td>
-<img src='https://github.com/DeekshaPrabhakar/Flicks/blob/master/flicksWalkthrough1.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
-</td>
-<td><img src='https://github.com/DeekshaPrabhakar/Flicks/blob/master/flicksWalkthrough.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
-</td>
-</tr>
-</table>
+
+<img src='https://github.com/DeekshaPrabhakar/Flicks/blob/master/flicks.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
@@ -54,7 +47,7 @@ GIF created with [LiceCap](http://www.cockos.com/licecap/).
 Describe any challenges encountered while building the app.
 - Collection view layout
 
-###Acknowledgements
+### Acknowledgements
 - <div>App Icon made by <a href="http://www.flaticon.com/authors/dimi-kazak" title="Dimi Kazak">Dimi Kazak</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
 - <div>Network error icon made by <a href="http://www.flaticon.com/authors/gregor-cresnar" title="Gregor Cresnar">Gregor Cresnar</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
 - <div>Release date icon made by <a href="http://www.flaticon.com/authors/madebyoliver" title="Madebyoliver">Madebyoliver</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
